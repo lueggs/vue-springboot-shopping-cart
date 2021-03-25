@@ -11,14 +11,15 @@
           >
           </b-form-select>
         </b-col>
-        <!-- <b-col>
-          <b-form-select v-model="selectModel" :options="optionModel">
-          </b-form-select>
-        </b-col> -->
         <b-col>
-          <b-input size="sm" placeholder="請輸入品牌或型號">查詢</b-input>
+          <b-input
+            size="sm"
+            v-model="inputQuery"
+            @keyup="inputHandler"
+            placeholder="請輸入品牌或型號"
+          ></b-input>
         </b-col>
-        <b-button size="sm" variant="outline-success">查詢</b-button>
+        <!-- <b-button size="sm" variant="outline-success">查詢</b-button> -->
       </b-row>
     </b-container>
     <b-pagination
@@ -58,7 +59,6 @@
         </b-card>
       </b-col>
     </b-row>
-    <!-- </div> -->
   </div>
 </template>
 
@@ -67,6 +67,7 @@ import product from "@/apis/products/product";
 export default {
   data() {
     return {
+      inputQuery: "",
       product: [],
       paginateItem: [],
       cartItems: [],
@@ -97,6 +98,7 @@ export default {
         });
       product.getAllBrand().then((res) => {
         const brands = res.data;
+        this.optionBrand.push("全部");
         brands.forEach((brand) => {
           this.optionBrand.push(brand.name);
         });
@@ -113,13 +115,28 @@ export default {
     },
     brandOnChange() {
       this.product = this.defaultProduct;
-      const query = this.selectBrand;
-      this.product = this.product.filter((val) => val.brand.name == query);
+      if (this.selectBrand !== "全部") {
+        this.product = this.product.filter(
+          (val) => val.brand.name == this.selectBrand
+        );
+      }
       this.rows = this.product.length;
       this.paginate(this.perPage, 0);
-      // const query = this.selectBrand;
-      // this.paginateItem = this.product.filter((val) => val.brand.name == query);
-      // this.rows = this.paginateItem.length;
+    },
+    inputHandler() {
+      this.product = this.defaultProduct;
+
+      if (this.inputQuery !== "") {
+        this.product = this.product.filter(
+          (val) =>
+            val.brand.name
+              .toLowerCase()
+              .includes(this.inputQuery.toLowerCase()) ||
+            val.name.toLowerCase().includes(this.inputQuery.toLowerCase())
+        );
+      }
+      this.rows = this.product.length;
+      this.paginate(this.perPage, 0);
     },
     cartHandler(product) {
       if (!this.state.cart.length == 0) {

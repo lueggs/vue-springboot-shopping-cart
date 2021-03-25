@@ -40,34 +40,45 @@
     <b-modal v-model="showCart" v-if="isLogin">
       <b-container>
         <b-row>
-          <b-col>品牌</b-col>
-          <b-col>商品</b-col>
-          <b-col class="text-center">數量</b-col>
-          <b-col class="text-right">價錢</b-col>
+          <b-col cols="2" class="text-left">品牌</b-col>
+          <b-col cols="2" class="text-center">商品</b-col>
+          <b-col cols="4" class="text-center ml-4">數量</b-col>
+          <b-col cols="2" class="text-center">價錢</b-col>
+          <b-col cols="2" class="text-right"></b-col>
         </b-row>
       </b-container>
       <b-container class="my-4" v-for="(item, i) in cart" :key="i">
         <b-row>
-          <b-col class="my-2">{{ item.brand.name }}</b-col>
-          <b-col class="my-2">{{ item.name }}</b-col>
-          <b-col class="my-2 text-right"
-            ><b-button size="sm" @click="plusHandler(i)"
+          <b-col cols="2" class="my-2 text-left">{{ item.brand.name }}</b-col>
+          <b-col cols="2" class="my-2 text-center">{{ item.name }}</b-col>
+          <b-col cols="4" class="my-2 text-right"
+            ><b-button class="mr-2" size="sm" @click="plusHandler(i)"
               ><font-awesome-icon icon="plus"></font-awesome-icon
             ></b-button>
-            <span class="mx-2">{{ itemAmount[i] }}</span>
-            <b-button size="sm" @click="minusHandler(i)"
-              ><font-awesome-icon icon="minus"></font-awesome-icon></b-button
-          ></b-col>
-          <b-col class="my-2 text-right">
+            <span>{{ itemAmount[i] }}</span>
+            <b-button class="ml-2" size="sm" @click="minusHandler(i)"
+              ><font-awesome-icon icon="minus"></font-awesome-icon
+            ></b-button>
+          </b-col>
+          <b-col cols="2" class="my-2 text-right">
             <b-button
               v-if="totlePrice(i, item.price) == 0"
               size="sm"
               variant="danger"
+              @click="removeHandler(i)"
               >移除</b-button
             >
-            <span v-else class="ml-2 text-right"
-              >${{ totlePrice(i, item.price) }}</span
-            >
+            <span v-else class="ml-4 text-right"
+              >${{ totlePrice(i, item.price) }}
+            </span>
+          </b-col>
+          <b-col cols="2" class="my-2 text-right">
+            <b-button size="sm" variant="light" @click="removeHandler(i)">
+              <font-awesome-icon
+                class="text-warning"
+                icon="trash"
+              ></font-awesome-icon
+            ></b-button>
           </b-col>
         </b-row>
       </b-container>
@@ -78,20 +89,16 @@
   </div>
 </template>
 <script>
-// import cartService from "@/apis/carts/cart";
-// import {mapState} from 'vuex'
-// import product from "@/apis/products/product";
+import { mapState } from "vuex";
 export default {
   data() {
     return {
       showCart: false,
-      // cart:this.$store.state.cart
     };
   },
   methods: {
     logout() {
       this.$store.dispatch("resetState");
-
       if (this.$route.path !== "/") {
         this.$router.push("/");
       }
@@ -99,46 +106,6 @@ export default {
     totlePrice(i, price) {
       return this.itemAmount[i] * price;
     },
-    // getCart() {
-    //   if (this.isLogin) {
-    //     const username = this.$store.state.username;
-    //     cartService
-    //       .getCartByUserName(username)
-    //       .then(
-    //         (res) => {
-    //           this.itemAmount = res.data.graAmount;
-    //           this.cartId = res.data.id;
-    //           const data = [];
-    //           data.push(res.data);
-    //           data.forEach((obj) => {
-    //             this.$store.state.cart = obj.graId;
-    //           });
-    //         },
-    //         (err) => {
-    //           console.log(err);
-    //         }
-    //       )
-    //       .then(() => {
-    //         const cart = this.$store.state.cart;
-    //         const length = cart.length;
-    //         cart.forEach((item) => {
-    //           product.getOneGracard(item).then((res) => {
-    //             cart.push(res.data);
-    //           });
-    //         });
-    //         cart.splice(0, length);
-    //         this.$store.state.cart = cart;
-    //         this.cart = this.$store.state.cart;
-    //       })
-    //       .then(() => {
-    //         setTimeout(() => {
-    //           this.showCart = !this.showCart;
-    //         }, 0);
-    //       });
-    //   } else {
-    //     this.showCart = !this.showCart;
-    //   }
-    // },
     minusHandler(i) {
       const count = this.itemAmount[i];
       if (count > 0) {
@@ -169,6 +136,10 @@ export default {
       //   console.log(res);
       // });
     },
+    removeHandler(i) {
+      this.cart.splice(i, 1);
+      this.itemAmount.splice(i, 1);
+    },
   },
   watch: {
     showCart(val) {
@@ -181,21 +152,7 @@ export default {
     isLogin() {
       return this.$store.state.token ? true : false;
     },
-    username() {
-      return this.$store.state.username;
-    },
-    role() {
-      return this.$store.state.role;
-    },
-    cart() {
-      return this.$store.state.cart;
-    },
-    itemAmount() {
-      return this.$store.state.itemAmount;
-    },
-    cartId() {
-      return this.$store.state.cartId;
-    },
+    ...mapState(["username", "role", "cart", "itemAmount", "cartId"]),
   },
   created() {
     if (sessionStorage.getItem("store")) {

@@ -44,25 +44,13 @@ export default {
   },
   methods: {
     getCart() {
-      // const username = this.$store.state.username;
-      // cartService
-      //   .getCartByUserName(username)
-      
-      // console.log(JSON.parse(this.$cookies.get('cart')))
-      const resolve =Promise.resolve(this.$cookies.get('cart'))
+      Promise.resolve(this.$cookies.get("cart"))
         .then(
           (res) => {
-            console.log(res)
+            console.log(res);
             this.cartId = res.id;
             const data = [];
             data.push(res);
-            // this.$store.dispatch("resetCart");
-            // data.forEach((obj) => {
-            //   // console.log(obj)
-            //   if (!obj.graId.length == 0) {
-            //     this.$store.dispatch("initCart", obj.graId);
-            //   }
-            // });
             this.$store.dispatch("initCart", res.graId);
             this.$store.dispatch("initItemAmount", res.graAmount);
             this.$store.dispatch("setCartId", res.id);
@@ -83,10 +71,6 @@ export default {
           });
           cart.splice(0, length);
           this.$store.dispatch("initCart", cart);
-          // console.log("cart")
-          // console.log(cart)
-          // this.cart = this.$store.state.cart;
-          // console.log(this.cart)
         });
     },
     login() {
