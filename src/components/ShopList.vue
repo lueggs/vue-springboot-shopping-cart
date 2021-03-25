@@ -70,7 +70,7 @@ export default {
       product: [],
       paginateItem: [],
       cartItems: [],
-      perPage: 6,
+      perPage: 3,
       currentPage: 1,
       rows: 1,
       selectBrand: null,
@@ -80,24 +80,28 @@ export default {
     };
   },
   created() {
-    product
-      .getAllGracard()
-      .then((res) => {
-        this.product = res.data;
-        this.rows = this.product.length;
-      })
-      .then(() => {
-        this.paginate(this.perPage, 0);
-      });
-    product.getAllBrand().then((res) => {
-      const brands = res.data;
-      brands.forEach((brand) => {
-        this.optionBrand.push(brand.name);
-      });
-    });
+    this.initProduct();
   },
 
   methods: {
+    initProduct() {
+      product
+        .getAllGracard()
+        .then((res) => {
+          this.product = res.data;
+          this.rows = this.product.length;
+          this.$store.dispatch("initProduct", res.data);
+        })
+        .then(() => {
+          this.paginate(this.perPage, 0);
+        });
+      product.getAllBrand().then((res) => {
+        const brands = res.data;
+        brands.forEach((brand) => {
+          this.optionBrand.push(brand.name);
+        });
+      });
+    },
     paginate(perPage, currentPage) {
       this.paginateItem = this.product.slice(
         perPage * currentPage,
@@ -108,9 +112,14 @@ export default {
       this.paginate(this.perPage, page - 1);
     },
     brandOnChange() {
+      this.product = this.defaultProduct;
       const query = this.selectBrand;
-      this.paginateItem = this.product.filter((val) => val.brand.name == query);
-      this.rows = this.paginateItem.length;
+      this.product = this.product.filter((val) => val.brand.name == query);
+      this.rows = this.product.length;
+      this.paginate(this.perPage, 0);
+      // const query = this.selectBrand;
+      // this.paginateItem = this.product.filter((val) => val.brand.name == query);
+      // this.rows = this.paginateItem.length;
     },
     cartHandler(product) {
       if (!this.state.cart.length == 0) {
@@ -120,7 +129,6 @@ export default {
             obj.brand.name == product.brand.name
           ) {
             this.state.itemAmount[this.state.cart.indexOf(obj)] += 1;
-
             arr.splice(i, arr.length - i);
           } else {
             if (i == arr.length - 1) {
@@ -140,6 +148,9 @@ export default {
   computed: {
     state() {
       return this.$store.state;
+    },
+    defaultProduct() {
+      return this.$store.state.product;
     },
   },
 };

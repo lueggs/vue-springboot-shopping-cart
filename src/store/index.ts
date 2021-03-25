@@ -13,7 +13,8 @@ const getDefaultState = () => {
     role: '',
     cart: [] as any,
     itemAmount: [0],
-    cartId: 0
+    cartId: 0,
+    product: []
   }
 }
 
@@ -49,6 +50,9 @@ export default new Vuex.Store({
     },
     SETCARTID(state, options) {
       state.cartId = options
+    },
+    INIT_PRODUCT(state, options) {
+      state.product = options
     }
 
   },
@@ -81,6 +85,9 @@ export default new Vuex.Store({
     },
     initCart(context, options) {
       context.commit('INIT_CART', options)
+    },
+    initProduct(context, options) {
+      context.commit('INIT_PRODUCT', options)
     }
   },
   modules: {
