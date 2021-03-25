@@ -156,7 +156,7 @@ export default {
       cart.forEach((obj) => {
         graId.push(obj.id);
       });
-     
+
       const req = {
         graId: graId,
         userName: this.username,
@@ -164,10 +164,10 @@ export default {
         createTime: null,
         _id: this.cartId,
       };
-      
-      cartService.updateCart(this.cartId, req).then((res) => {
-        console.log(res);
-      });
+      this.$cookies.set("cart", JSON.stringify(req));
+      // cartService.updateCart(this.cartId, req).then((res) => {
+      //   console.log(res);
+      // });
     },
   },
   watch: {

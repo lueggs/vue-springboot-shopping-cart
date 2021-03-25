@@ -44,14 +44,18 @@ export default {
   },
   methods: {
     getCart() {
-      const username = this.$store.state.username;
-      cartService
-        .getCartByUserName(username)
+      // const username = this.$store.state.username;
+      // cartService
+      //   .getCartByUserName(username)
+      
+      // console.log(JSON.parse(this.$cookies.get('cart')))
+      const resolve =Promise.resolve(this.$cookies.get('cart'))
         .then(
           (res) => {
-            this.cartId = res.data.id;
+            console.log(res)
+            this.cartId = res.id;
             const data = [];
-            data.push(res.data);
+            data.push(res);
             // this.$store.dispatch("resetCart");
             // data.forEach((obj) => {
             //   // console.log(obj)
@@ -59,9 +63,9 @@ export default {
             //     this.$store.dispatch("initCart", obj.graId);
             //   }
             // });
-            this.$store.dispatch("initCart", res.data.graId);
-            this.$store.dispatch("initItemAmount", res.data.graAmount);
-            this.$store.dispatch("setCartId", res.data.id);
+            this.$store.dispatch("initCart", res.graId);
+            this.$store.dispatch("initItemAmount", res.graAmount);
+            this.$store.dispatch("setCartId", res.id);
           },
           (err) => {
             console.log(err);
@@ -115,8 +119,8 @@ export default {
     },
     logout() {
       this.$store.dispatch("resetState");
-      localStorage.clear()
-      sessionStorage.clear()
+      localStorage.clear();
+      sessionStorage.clear();
     },
   },
 };

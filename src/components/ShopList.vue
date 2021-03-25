@@ -113,37 +113,28 @@ export default {
       this.rows = this.paginateItem.length;
     },
     cartHandler(product) {
-      // const state = this.$store.state;
+      if (!this.state.cart.length == 0) {
+        Array.from(this.state.cart).forEach((obj, i, arr) => {
+          if (
+            obj.name == product.name &&
+            obj.brand.name == product.brand.name
+          ) {
+            this.state.itemAmount[this.state.cart.indexOf(obj)] += 1;
 
-      Array.from(this.state.cart).forEach((obj, i, arr) => {
-        if (obj.name == product.name && obj.brand.name == product.brand.name) {
-          this.state.itemAmount[this.state.cart.indexOf(obj)] += 1;
-          arr.splice(i, arr.length - i);
-        } else {
-          this.cartItems.push(product);
-          this.$store.dispatch("addCart", product);
-          this.$store.dispatch("addItemAmount", 1);
-          arr.splice(i, arr.length - i);
-        }
-      });
-      // state.cart.filter((obj) => {
-      //   if (obj.name == product.name && obj.brand.name == product.brand.name) {
-      //     console.log(state.itemAmount[state.cart.indexOf(obj)]);
-      //     state.itemAmount[state.cart.indexOf(obj)] += 1;
-      //   } else {
-      //     query = true;
-      //     // this.cartItems.push(product);
-      //     // this.$store.dispatch("addCart", product);
-      //     // this.$store.dispatch("addItemAmount", 1);
-      //   }
-      // });
-      // if (query) {
-      //   console.log(state.cart);
-      //   this.cartItems.push(product);
-      //   this.$store.dispatch("addCart", product);
-      //   this.$store.dispatch("addItemAmount", 1);
-      // }
-      // this.$store.dispatch('addCart',this.cartItems)
+            arr.splice(i, arr.length - i);
+          } else {
+            if (i == arr.length - 1) {
+              this.cartItems.push(product);
+              this.$store.dispatch("addCart", product);
+              this.$store.dispatch("addItemAmount", 1);
+              arr.splice(i, arr.length - i);
+            }
+          }
+        });
+      } else {
+        this.$store.dispatch("addCart", product);
+        this.$store.dispatch("initItemAmount", [1]);
+      }
     },
   },
   computed: {
