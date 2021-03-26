@@ -38,7 +38,12 @@
       </b-collapse>
     </b-navbar>
     <b-modal v-model="showCart" v-if="isLogin">
-      <b-container>
+      <template #modal-header>
+        <div class="w-100 text-center">
+          <h3 class="text-primary">您的購物車</h3>
+        </div>
+      </template>
+      <b-container class="p-0">
         <b-row>
           <b-col cols="2" class="text-left">品牌</b-col>
           <b-col cols="2" class="text-center">商品</b-col>
@@ -47,16 +52,26 @@
           <b-col cols="2" class="text-right"></b-col>
         </b-row>
       </b-container>
-      <b-container class="my-4" v-for="(item, i) in cart" :key="i">
+      <b-container class="mx-0 p-0 my-4" v-for="(item, i) in cart" :key="i">
         <b-row>
           <b-col cols="2" class="my-2 text-left">{{ item.brand.name }}</b-col>
           <b-col cols="2" class="my-2 text-center">{{ item.name }}</b-col>
           <b-col cols="4" class="my-2 text-right"
-            ><b-button class="mr-2" size="sm" @click="plusHandler(i)"
+            ><b-button
+              class="mr-2"
+              variant="outline-info"
+              pill
+              size="sm"
+              @click="plusHandler(i)"
               ><font-awesome-icon icon="plus"></font-awesome-icon
             ></b-button>
-            <span>{{ itemAmount[i] }}</span>
-            <b-button class="ml-2" size="sm" @click="minusHandler(i)"
+            <span class="mx-1 p-0">{{ itemAmount[i] }}</span>
+            <b-button
+              class="ml-2"
+              variant="outline-info"
+              pill
+              size="sm"
+              @click="minusHandler(i)"
               ><font-awesome-icon icon="minus"></font-awesome-icon
             ></b-button>
           </b-col>
@@ -80,9 +95,25 @@
               ></font-awesome-icon
             ></b-button>
           </b-col>
-          
         </b-row>
       </b-container>
+      <template #modal-footer>
+        <div class="w-100">
+          <span class="mt-1 float-right">總金額：${{ orderPrice }}</span>
+          <b-button
+            class="ml-1 float-left"
+            variant="outline-secondary"
+            @click="showCart = false"
+            >返回</b-button
+          >
+          <b-button
+            class="ml-3 float-left"
+            variant="outline-success"
+            @click="checkoutHandler"
+            >結帳</b-button
+          >
+        </div>
+      </template>
     </b-modal>
     <div id="nav">
       <router-view />
@@ -91,6 +122,7 @@
 </template>
 <script>
 import { mapState } from "vuex";
+// import cart from './apis/carts/cart';
 export default {
   data() {
     return {
@@ -138,6 +170,9 @@ export default {
       this.cart.splice(i, 1);
       this.itemAmount.splice(i, 1);
     },
+    checkoutHandler() {
+      console.log(123);
+    },
   },
   watch: {
     showCart(val) {
@@ -149,6 +184,13 @@ export default {
   computed: {
     isLogin() {
       return this.$store.state.token ? true : false;
+    },
+    orderPrice() {
+      let totalPrice = 0;
+      this.cart.forEach((c, i) => {
+        totalPrice += c.price * this.itemAmount[i];
+      });
+      return totalPrice;
     },
     ...mapState(["username", "role", "cart", "itemAmount", "cartId"]),
   },

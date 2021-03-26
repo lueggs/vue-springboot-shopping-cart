@@ -4,7 +4,7 @@
       <b-row cols="8" class="justify-content-md-center">
         <b-col>
           <b-form-select
-            @change="brandOnChange"
+            @change="queryHandler"
             size="sm"
             v-model="selectBrand"
             :options="optionBrand"
@@ -15,14 +15,14 @@
           <b-input
             size="sm"
             v-model="inputQuery"
-            @keyup="inputHandler"
+            @keyup="queryHandler"
             placeholder="請輸入品牌或型號"
           >
           </b-input>
         </b-col>
         <b-button
           v-if="inputQuery !== ''"
-          @click="clearInput"
+          @click="resetQuery"
           size="sm"
           variant="light"
           ><font-awesome-icon
@@ -30,7 +30,6 @@
             icon="times-circle"
           ></font-awesome-icon
         ></b-button>
-        <!-- <b-button size="sm" variant="outline-success">查詢</b-button> -->
       </b-row>
     </b-container>
     <b-pagination
@@ -57,14 +56,22 @@
       >
         <b-card
           :img-src="require('../assets/brand' + pro.brandid + '.png')"
+          img-top
+          img-height="300"
           :title="pro.brand.name"
           :sub-title="pro.name"
           class="m-5"
         >
-          <b-card-text>
-            {{ pro.description }}
-          </b-card-text>
-          <b-button variant="outline-info" @click="cartHandler(pro)">
+          <small class="my-2 btn btn-sm btn-light float-left text-warning"
+            >${{ pro.price }}</small
+          >
+          <b-button
+            class="my-2 float-right"
+            pill
+            size="sm"
+            variant="outline-info"
+            @click="cartHandler(pro)"
+          >
             加入購物車
           </b-button>
         </b-card>
@@ -96,9 +103,10 @@ export default {
   },
 
   methods: {
-    clearInput() {
+    resetQuery() {
       this.inputQuery = "";
-      this.inputHandler();
+      this.selectBrand = null;
+      this.queryHandler();
     },
     initProduct() {
       product
@@ -131,8 +139,9 @@ export default {
     brandOnChange() {
       this.product = this.defaultProduct;
       if (this.selectBrand !== "全部") {
+        this.query = this.selectBrand;
         this.product = this.product.filter(
-          (val) => val.brand.name == this.selectBrand
+          (val) => val.brand.name == this.query
         );
       }
       this.rows = this.product.length;
@@ -142,13 +151,50 @@ export default {
       this.product = this.defaultProduct;
 
       if (this.inputQuery !== "") {
-        this.product = this.product.filter(
-          (val) =>
-            val.brand.name
-              .toLowerCase()
-              .includes(this.inputQuery.toLowerCase()) ||
-            val.name.toLowerCase().includes(this.inputQuery.toLowerCase())
-        );
+        if (!this.selectBrand == "null" || !this.selectBrand == "全部") {
+          this.query = this.selectBrand + " " + this.inputQuery;
+          this.product = this.product.filter(
+            (val) =>
+              val.brand.name.toLowerCase().includes(this.query.toLowerCase()) &&
+              val.name.toLowerCase().includes(this.query.toLowerCase())
+          );
+        } else {
+          this.query = this.inputQuery;
+          this.product = this.product.filter(
+            (val) =>
+              val.brand.name.toLowerCase().includes(this.query.toLowerCase()) ||
+              val.name.toLowerCase().includes(this.query.toLowerCase())
+          );
+        }
+      }
+      this.rows = this.product.length;
+      this.paginate(this.perPage, 0);
+    },
+    queryHandler() {
+      this.product = this.defaultProduct;
+      this.currentPage = 1;
+      if (this.inputQuery !== "") {
+        if (!(this.selectBrand == null || this.selectBrand == "全部")) {
+          this.product = this.product.filter(
+            (val) =>
+              val.brand.name == this.selectBrand &&
+              val.name.toLowerCase().includes(this.inputQuery.toLowerCase())
+          );
+        } else {
+          this.product = this.product.filter(
+            (val) =>
+              val.brand.name
+                .toLowerCase()
+                .includes(this.inputQuery.toLowerCase()) ||
+              val.name.toLowerCase().includes(this.inputQuery.toLowerCase())
+          );
+        }
+      } else {
+        if (!(this.selectBrand == null || this.selectBrand == "全部")) {
+          this.product = this.product.filter(
+            (val) => val.brand.name == this.selectBrand
+          );
+        }
       }
       this.rows = this.product.length;
       this.paginate(this.perPage, 0);
