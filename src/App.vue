@@ -80,6 +80,7 @@
               ></font-awesome-icon
             ></b-button>
           </b-col>
+          
         </b-row>
       </b-container>
     </b-modal>
@@ -132,9 +133,6 @@ export default {
         _id: this.cartId,
       };
       this.$cookies.set("cart", JSON.stringify(req));
-      // cartService.updateCart(this.cartId, req).then((res) => {
-      //   console.log(res);
-      // });
     },
     removeHandler(i) {
       this.cart.splice(i, 1);
@@ -168,7 +166,6 @@ export default {
     window.addEventListener("beforeunload", () => {
       sessionStorage.setItem("store", JSON.stringify(this.$store.state));
       localStorage.setItem("cart", JSON.stringify(this.$store.state.cart));
-
       this.saveCart();
     });
   },

@@ -17,8 +17,19 @@
             v-model="inputQuery"
             @keyup="inputHandler"
             placeholder="請輸入品牌或型號"
-          ></b-input>
+          >
+          </b-input>
         </b-col>
+        <b-button
+          v-if="inputQuery !== ''"
+          @click="clearInput"
+          size="sm"
+          variant="light"
+          ><font-awesome-icon
+            class="text-secondary"
+            icon="times-circle"
+          ></font-awesome-icon
+        ></b-button>
         <!-- <b-button size="sm" variant="outline-success">查詢</b-button> -->
       </b-row>
     </b-container>
@@ -85,6 +96,10 @@ export default {
   },
 
   methods: {
+    clearInput() {
+      this.inputQuery = "";
+      this.inputHandler();
+    },
     initProduct() {
       product
         .getAllGracard()
