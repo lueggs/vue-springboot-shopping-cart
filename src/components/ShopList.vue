@@ -136,40 +136,6 @@ export default {
     onPagination(page) {
       this.paginate(this.perPage, page - 1);
     },
-    brandOnChange() {
-      this.product = this.defaultProduct;
-      if (this.selectBrand !== "全部") {
-        this.query = this.selectBrand;
-        this.product = this.product.filter(
-          (val) => val.brand.name == this.query
-        );
-      }
-      this.rows = this.product.length;
-      this.paginate(this.perPage, 0);
-    },
-    inputHandler() {
-      this.product = this.defaultProduct;
-
-      if (this.inputQuery !== "") {
-        if (!this.selectBrand == "null" || !this.selectBrand == "全部") {
-          this.query = this.selectBrand + " " + this.inputQuery;
-          this.product = this.product.filter(
-            (val) =>
-              val.brand.name.toLowerCase().includes(this.query.toLowerCase()) &&
-              val.name.toLowerCase().includes(this.query.toLowerCase())
-          );
-        } else {
-          this.query = this.inputQuery;
-          this.product = this.product.filter(
-            (val) =>
-              val.brand.name.toLowerCase().includes(this.query.toLowerCase()) ||
-              val.name.toLowerCase().includes(this.query.toLowerCase())
-          );
-        }
-      }
-      this.rows = this.product.length;
-      this.paginate(this.perPage, 0);
-    },
     queryHandler() {
       this.product = this.defaultProduct;
       this.currentPage = 1;

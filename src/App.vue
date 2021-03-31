@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand class="mx-3">
+    <b-navbar toggleable="lg" type="dark" variant="dark">
+      <!-- <b-navbar-brand class="mx-3">
         <router-link class="text-dark" to="/">
           <b-button variant="light">首頁</b-button>
         </router-link>
-      </b-navbar-brand>
+      </b-navbar-brand> -->
       <b-navbar-brand class="mx-2" left>
-        <router-link class="text-dark" to="/product">
+        <router-link class="text-dark" to="/">
           <b-button variant="light">產品</b-button>
         </router-link>
       </b-navbar-brand>
@@ -16,8 +16,8 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="ml-auto">
-          <b-nav-item v-if="isLogin" right>
-            <b-button variant="secondary" @click="showCart = !showCart">
+          <b-nav-item class="mr-2" v-if="isLogin" right>
+            <b-button variant="primary" @click="showCart = !showCart">
               <font-awesome-icon icon="shopping-cart"></font-awesome-icon>
             </b-button>
           </b-nav-item>
@@ -26,18 +26,19 @@
               <b-button variant="light">登入</b-button>
             </router-link>
           </b-nav-item>
-          <b-nav-item-dropdown class="" v-else right>
+          <b-nav-item-dropdown class="btn" v-else right>
             <!-- Using 'button-content' slot -->
             <template #button-content>
               <em class="text-white">{{ username }}</em>
             </template>
             <b-dropdown-item href="#">個人資料</b-dropdown-item>
+            <b-dropdown-item href="/order">我的訂單</b-dropdown-item>
             <b-dropdown-item @click="logout">登出</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-    <b-modal v-model="showCart" v-if="isLogin">
+    <b-modal v-model="showCart" :body-bg-variant="'light'" v-if="isLogin">
       <template #modal-header>
         <div class="w-100 text-center">
           <h3 class="text-primary">您的購物車</h3>
@@ -51,6 +52,9 @@
           <b-col cols="2" class="text-center">價錢</b-col>
           <b-col cols="2" class="text-right"></b-col>
         </b-row>
+      </b-container>
+      <b-container class="my-4" v-if="cart == null || cart.length == 0">
+        <p class="h5 text-secondary text-center">購物車裡沒有商品喔</p>
       </b-container>
       <b-container class="mx-0 p-0 my-4" v-for="(item, i) in cart" :key="i">
         <b-row>
@@ -79,7 +83,9 @@
             <b-button
               v-if="totlePrice(i, item.price) == 0"
               size="sm"
-              variant="danger"
+              class="text-right"
+              pill
+              variant="outline-danger"
               @click="removeHandler(i)"
               >移除</b-button
             >
@@ -118,11 +124,13 @@
     <div id="nav">
       <router-view />
     </div>
+    <!-- <sock></sock> -->
   </div>
 </template>
 <script>
 import { mapState } from "vuex";
-// import cart from './apis/carts/cart';
+// import sock from "@/components/socks";
+import orderService from "@/apis/carts/order";
 export default {
   data() {
     return {
@@ -171,7 +179,36 @@ export default {
       this.itemAmount.splice(i, 1);
     },
     checkoutHandler() {
-      console.log(123);
+      const items = [];
+      this.cart.forEach((obj) => {
+        items.push({
+          id: obj.id,
+          name: obj.name,
+          brand: obj.brand.name,
+          amount: 0,
+        });
+      });
+      this.itemAmount.forEach((obj, i) => {
+        items[i].amount = obj;
+      });
+      const req = {
+        username: this.username,
+        items: items,
+        totalPrice: this.orderPrice,
+      };
+      orderService
+        .createOrder(req)
+        .then((res) => {
+          console.log("order checkout:");
+          console.log(res);
+          this.$store.dispatch("addOrder", res.data);
+        })
+        .then(() => {
+          this.$store.dispatch("statusOrder", true);
+          this.showCart = false;
+          this.$store.dispatch("initCart", []);
+          this.$router.push("/order");
+        });
     },
   },
   watch: {
@@ -211,6 +248,9 @@ export default {
       this.saveCart();
     });
   },
+  // components: {
+  //   sock,
+  // },
 };
 </script>
 <style>

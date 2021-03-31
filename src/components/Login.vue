@@ -1,6 +1,6 @@
 <template class="container">
-  <b-form class="card w-25 m-auto border border-info">
-    <p class="h4 text-center mb-4 my-3">Sign in</p>
+  <b-form class="rounded w-25 m-auto border border-info">
+    <p class="h4 text-center mb-4 my-3">登入頁面</p>
     <div class="grey-text">
       <b-form-input
         v-model.trim="loginInput.username"
@@ -17,11 +17,11 @@
       />
     </div>
     <div class="text-center my-4">
-      <b-button variant="outline-primary" @click="login">Login</b-button>
+      <b-button variant="outline-primary" @click="login">登入</b-button>
       <b-button class="mx-2" variant="outline-success" @click="userLogin"
-        >userLogin</b-button
+        >使用者</b-button
       >
-      <b-button variant="outline-warning" @click="mgrLogin">mgrLogin</b-button>
+      <b-button variant="outline-warning" @click="mgrLogin">管理者</b-button>
     </div>
   </b-form>
 </template>
@@ -30,6 +30,7 @@
 import req from "@/apis/https";
 // import cartService from "@/apis/carts/cart";
 import product from "@/apis/products/product";
+import orderService from "@/apis/carts/order";
 
 const LOGIN_API_URL = "signin";
 
@@ -43,17 +44,26 @@ export default {
     };
   },
   methods: {
+    initWebSockets(username) {
+      const webSocket = new WebSocket(
+        `ws://localhost:9090/websocket/${username}`
+      );
+      webSocket.onopen = () => {
+        console.log("websocket connected");
+      };
+      webSocket.onmessage = (res) => {
+        console.log(res.data);
+        this.$emit("msg" + res.data);
+      };
+    },
     getCart() {
       Promise.resolve(this.$cookies.get("cart"))
         .then(
           (res) => {
-            console.log(res);
             this.cartId = res.id;
-            const data = [];
-            data.push(res);
             this.$store.dispatch("initCart", res.graId);
             this.$store.dispatch("initItemAmount", res.graAmount);
-            this.$store.dispatch("setCartId", res.id);
+            // this.$store.dispatch("setCartId", res.id);
           },
           (err) => {
             console.log(err);
@@ -73,6 +83,13 @@ export default {
           this.$store.dispatch("initCart", cart);
         });
     },
+    getOrder() {
+      orderService
+        .getOrdersByUserName(this.$store.state.username)
+        .then((res) => {
+          this.$store.dispatch("setOrder", res.data);
+        });
+    },
     login() {
       req("post", LOGIN_API_URL, this.loginInput).then((res) => {
         this.$store.dispatch("setAuth", res.data);
@@ -88,7 +105,9 @@ export default {
           this.$router.push("/");
         })
         .then(() => {
+          this.initWebSockets("aaa@gmail.com");
           this.getCart();
+          this.getOrder();
         });
     },
     mgrLogin() {

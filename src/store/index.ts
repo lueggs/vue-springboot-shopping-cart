@@ -3,18 +3,19 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 
-const LOGIN_API_URL = 'signin'
 
 const getDefaultState = () => {
   return {
     token: '',
     username: '',
-    tokenExp: 0,
+    // tokenExp: 0,
     role: '',
     cart: [] as any,
     itemAmount: [0],
-    cartId: 0,
-    product: []
+    // cartId: 0,
+    product: [],
+    order: [] as any,
+    newOrder: false
   }
 }
 
@@ -25,7 +26,7 @@ export default new Vuex.Store({
     SET_AUTH(state, options) {
       state.token = options.token
       state.username = options.username
-      state.tokenExp = options.tokenExp
+      // state.tokenExp = options.tokenExp
       state.role = options.role
     },
     RESET_STATE(state) {
@@ -38,8 +39,6 @@ export default new Vuex.Store({
       state.cart.push(options)
     },
     INIT_CART(state, options) {
-      console.log("options")
-      console.log(options)
       state.cart = options
     },
     INIT_ITEMAMOUNT(state, options) {
@@ -48,12 +47,20 @@ export default new Vuex.Store({
     ADD_ITEMAMOUNT(state, options: number) {
       state.itemAmount.push(options)
     },
-    SETCARTID(state, options) {
-      state.cartId = options
-    },
+
     INIT_PRODUCT(state, options) {
       state.product = options
+    },
+    SET_ORDER(state, options) {
+      state.order = options
+    },
+    ADD_ORDER(state, options) {
+      state.order.push(options)
+    },
+    STATUS_ORDER(state, options) {
+      state.newOrder = options
     }
+
 
   },
   actions: {
@@ -80,14 +87,21 @@ export default new Vuex.Store({
     addItemAmount(context, options) {
       context.commit('ADD_ITEMAMOUNT', options)
     },
-    setCartId(context, options) {
-      context.commit('SETCARTID', options)
-    },
+
     initCart(context, options) {
       context.commit('INIT_CART', options)
     },
     initProduct(context, options) {
       context.commit('INIT_PRODUCT', options)
+    },
+    setOrder(context, options) {
+      context.commit('SET_ORDER', options)
+    },
+    addOrder(context, options) {
+      context.commit('ADD_ORDER', options)
+    },
+    statusOrder(context, options) {
+      context.commit('STATUS_ORDER', options)
     }
   },
   modules: {
