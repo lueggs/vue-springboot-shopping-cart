@@ -28,7 +28,6 @@
 
 <script>
 import req from "@/apis/https";
-// import cartService from "@/apis/carts/cart";
 import product from "@/apis/products/product";
 import orderService from "@/apis/carts/order";
 
@@ -63,7 +62,6 @@ export default {
             this.cartId = res.id;
             this.$store.dispatch("initCart", res.graId);
             this.$store.dispatch("initItemAmount", res.graAmount);
-            // this.$store.dispatch("setCartId", res.id);
           },
           (err) => {
             console.log(err);
@@ -71,7 +69,6 @@ export default {
         )
         .then(() => {
           const cart = this.$store.state.cart;
-          console.log(cart);
           const length = cart.length;
 
           cart.forEach((item) => {
@@ -97,16 +94,23 @@ export default {
     },
     userLogin() {
       req("post", LOGIN_API_URL, { username: "aaa@gmail.com", password: "aaa" })
-        .then((res) => {
-          this.$store.dispatch("setAuth", res.data);
-          location.reload;
-        })
+        .then(
+          (res) => {
+            this.$store.dispatch("setAuth", res.data);
+            location.reload;
+          },
+          (err) => {
+            alert(err);
+          }
+        )
         .then(() => {
           this.$router.push("/");
         })
         .then(() => {
           this.initWebSockets("aaa@gmail.com");
+          // 登入後取得使用者購物車內容
           this.getCart();
+          // 取得訂單內容
           this.getOrder();
         });
     },
@@ -121,6 +125,7 @@ export default {
         });
     },
     logout() {
+      // 登出清除store.localStorage.sessionStorage
       this.$store.dispatch("resetState");
       localStorage.clear();
       sessionStorage.clear();

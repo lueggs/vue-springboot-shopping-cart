@@ -69,7 +69,6 @@
 </template>
 
 <script>
-// import productService from '@/apis/products/product'
 export default {
   data() {
     return {
@@ -87,6 +86,7 @@ export default {
       return this.$store.state.order;
     },
     status() {
+      
       return this.$store.state.newOrder;
     },
   },
@@ -95,10 +95,12 @@ export default {
       this.$store.dispatch("statusOrder", false);
     },
     newOrder() {
+      // 新訂單成立跳轉本頁先只顯示該筆訂單
       const length = this.orders.length - 1;
       return new Array(this.orders[length]);
     },
     orderName(data) {
+      // 處理訂單項目名稱 品牌+品項名
       if (data.length == 1) {
         return data[0].brand + " " + data[0].name;
       } else {
@@ -110,6 +112,7 @@ export default {
       }
     },
     amount(data) {
+      // 訂單數量
       if (data.length == 1) {
         return data[0].amount;
       } else {

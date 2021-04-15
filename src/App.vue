@@ -139,7 +139,10 @@ export default {
   },
   methods: {
     logout() {
+      // 登出清除store.localStorage.sessionStorage
       this.$store.dispatch("resetState");
+      localStorage.clear();
+      sessionStorage.clear();
       if (this.$route.path !== "/") {
         this.$router.push("/");
       }
@@ -148,6 +151,7 @@ export default {
       return this.itemAmount[i] * price;
     },
     minusHandler(i) {
+      // 使用$set監聽物件才會重新渲染畫面
       const count = this.itemAmount[i];
       if (count > 0) {
         this.$set(this.itemAmount, i, this.itemAmount[i] - 1);
@@ -172,6 +176,7 @@ export default {
         createTime: null,
         _id: this.cartId,
       };
+      // 將cookies存入
       this.$cookies.set("cart", JSON.stringify(req));
     },
     removeHandler(i) {
@@ -201,9 +206,11 @@ export default {
         .then((res) => {
           console.log("order checkout:");
           console.log(res);
+          // 訂單成立Push新訂單到$store
           this.$store.dispatch("addOrder", res.data);
         })
         .then(() => {
+          // 新訂單狀態
           this.$store.dispatch("statusOrder", true);
           this.showCart = false;
           this.$store.dispatch("initCart", []);
